@@ -1,0 +1,2 @@
+<use name=CondCore/ORA>			
+<bin file=ora_database_manager.cpp name=ora_database_manager></bin>
