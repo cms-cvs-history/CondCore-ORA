@@ -48,4 +48,3 @@
 <bin file=testORAUtility.cc name=testORAUtility>
 <lib name=testORADict>
 </bin>
-
