@@ -46,6 +46,9 @@
 <bin file=testORA_12.cc name=testORA_12>
 <lib name=testORADict>
 </bin>
+<bin file=testORAIO.cc name=testORAIO>
+<lib name=testORADict>
+</bin>
 <bin file=testORAUtility.cc name=testORAUtility>
 <lib name=testORADict>
 </bin>
