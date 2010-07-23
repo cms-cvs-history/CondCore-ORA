@@ -52,3 +52,8 @@
 <bin file=testORAUtility.cc name=testORAUtility>
 <lib name=testORADict>
 </bin>
+<bin file=test_Record.cpp name=testORARecord>
+</bin>
+<bin file=test_AnyData.cpp name=testORARecordDetails>
+</bin>                
+
