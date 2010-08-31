@@ -67,12 +67,11 @@ namespace ora {
         data.extend<int>( "LOCK" );
         data["LOCK"].data<int>() = 1;
         if( cursor.next() ){
+          // row found. will be locked by the DB if some other session owns the transaction...
           std::string setCLause = "LOCK = :LOCK";
           table.dataEditor().updateRows( setCLause, condition , data );
         } else {
-          coral::AttributeList data;
-          data.extend<int>( "LOCK" );
-          data["LOCK"].data<int>() = 1;
+          // no row found... no lock!
           table.dataEditor().insertRow( data );
         }
         m_lock = true;
