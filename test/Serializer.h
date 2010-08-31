@@ -18,7 +18,6 @@
 #include "CoralBase/AttributeList.h"
 #include "CoralBase/Attribute.h"
 //
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace ora {
 
