@@ -63,6 +63,7 @@ namespace ora {
         query->setCondition( condition, coral::AttributeList() );
         query->setForUpdate();
         coral::ICursor& cursor = query->execute();
+	std::cout <<"##### LOCK OBTAINED"<<std::endl;
         coral::AttributeList data;
         data.extend<int>( "LOCK" );
         data["LOCK"].data<int>() = 1;
@@ -83,6 +84,7 @@ namespace ora {
       if( m_lock ){
         m_lock = false;
         m_session->transaction().commit();
+	std::cout <<"##### LOCK RELEASED"<<std::endl;
       }
     }
     
