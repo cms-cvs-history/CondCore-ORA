@@ -27,10 +27,12 @@ namespace ora {
       m_tableName( name+"_LOCK" ),
       m_connServ(),
       m_session(),
-      m_lock( false ){
+      m_lock( false ),
+      m_name(""){
     }
       
     virtual ~Serializer(){
+      std::cout << "##### SErializer DTOR"<<std::endl;
       release();
     }
     
@@ -48,7 +50,8 @@ namespace ora {
       }
     }
 
-    void lock( const std::string& connectionString ){
+    void lock( const std::string& connectionString, const std::string& testName ){
+      m_name = testName;
       if( !m_lock ){
         m_connServ.configuration().setConnectionTimeOut(0);
         m_session.reset( m_connServ.connect( connectionString, coral::Update ) );
@@ -63,7 +66,7 @@ namespace ora {
         query->setCondition( condition, coral::AttributeList() );
         query->setForUpdate();
         coral::ICursor& cursor = query->execute();
-	std::cout <<"##### LOCK OBTAINED"<<std::endl;
+	//std::cout <<"##### LOCK OBTAINED by test "<<m_name<<std::endl;
         coral::AttributeList data;
         data.extend<int>( "LOCK" );
         data["LOCK"].data<int>() = 1;
@@ -84,7 +87,7 @@ namespace ora {
       if( m_lock ){
         m_lock = false;
         m_session->transaction().commit();
-	std::cout <<"##### LOCK RELEASED"<<std::endl;
+	//std::cout <<"##### LOCK RELEASED by test "<<m_name<<std::endl;
       }
     }
     
@@ -95,6 +98,7 @@ namespace ora {
     coral::ConnectionService m_connServ;
     std::auto_ptr<coral::ISessionProxy> m_session;
     bool m_lock;
+    std::string m_name;
     
   };
   
