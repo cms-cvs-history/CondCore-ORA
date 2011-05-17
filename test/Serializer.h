@@ -32,7 +32,6 @@ namespace ora {
     }
       
     virtual ~Serializer(){
-      std::cout << "##### SErializer DTOR"<<std::endl;
       release();
     }
     
