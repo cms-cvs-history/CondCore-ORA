@@ -25,8 +25,7 @@ namespace ora {
 
     private:
       Reflex::Type m_objectType;
-      MappingElement& m_mapping;
-      int m_columnIndex;
+      std::string m_columnName;
       ContainerSchema& m_schema;
       
     private:
@@ -87,8 +86,7 @@ namespace ora {
 
     private:
       Reflex::Type m_objectType;
-      MappingElement& m_mapping;
-      int m_columnIndex;
+      std::string m_columnName;
       ContainerSchema& m_schema;
       
     private:

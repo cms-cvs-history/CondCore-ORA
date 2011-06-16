@@ -17,14 +17,17 @@ ora::BlobWriterBase::BlobWriterBase( const Reflex::Type& objectType,
                                      MappingElement& mapping,
                                      ContainerSchema& contSchema ):
   m_objectType( objectType ),
-  m_mapping( mapping ),
-  m_columnIndex(-1),
+  m_columnName( "" ),
   m_schema( contSchema ),
   m_dataElement( 0 ),
   m_relationalData( 0 ),
   m_relationalBuffer( 0 ),
   m_blobWriter( 0 ),
   m_useCompression( true ){
+  
+  if( mapping.columnNames().size() ){
+    m_columnName = mapping.columnNames()[0];
+  }
 }
 
 ora::BlobWriterBase::~BlobWriterBase(){
@@ -33,14 +36,13 @@ ora::BlobWriterBase::~BlobWriterBase(){
 bool ora::BlobWriterBase::buildDataElement(DataElement& dataElement,
                                            IRelationalData& relationalData,
                                            RelationalBuffer& operationBuffer){
-  if( m_mapping.columnNames().size() == 0 ){
-    throwException( "The mapping element does not contain columns.",
+  if( m_columnName.empty() ){
+    throwException( "Column name not found ",
                     "BlobWriterBase::build");
   }
 
   m_dataElement = &dataElement;
-  std::string columnName = m_mapping.columnNames()[0];
-  m_columnIndex = relationalData.addBlobData( columnName );
+  relationalData.addBlobData( m_columnName );
   m_relationalData = &relationalData;
   m_relationalBuffer = &operationBuffer;
   m_blobWriter = m_schema.blobStreamingService();
@@ -58,7 +60,7 @@ void ora::BlobWriterBase::bindData( const void* data ){
                     "BlobWriterBase::bindData");
   }
   void* dataElementAddress = m_dataElement->address( data );
-  coral::Attribute& relDataElement = m_relationalData->data()[ m_columnIndex ];
+  coral::Attribute& relDataElement = m_relationalData->data()[ m_columnName ];
   boost::shared_ptr<coral::Blob> blobData = m_blobWriter->write( dataElementAddress, m_objectType, m_useCompression );
   m_relationalBuffer->storeBlob( blobData );
   relDataElement.bind<coral::Blob>( *blobData );
@@ -115,12 +117,15 @@ ora::BlobReader::BlobReader( const Reflex::Type& objectType,
                              MappingElement& mapping,
                              ContainerSchema& contSchema ):
   m_objectType( objectType ),
-  m_mapping( mapping ),
-  m_columnIndex( -1 ),
+  m_columnName( "" ),
   m_schema( contSchema ),
   m_dataElement( 0 ),
   m_relationalData( 0 ),
   m_blobReader( 0 ){
+  
+  if( mapping.columnNames().size() ){
+    m_columnName = mapping.columnNames()[0];
+  }
 }
 
 ora::BlobReader::~BlobReader(){
@@ -129,14 +134,13 @@ ora::BlobReader::~BlobReader(){
 bool ora::BlobReader::build(DataElement& dataElement,
                             IRelationalData& relationalData){
   
-  if( m_mapping.columnNames().size() == 0 ){
-    throwException( "The mapping element does not contain columns.",
+  if( m_columnName.empty() ){
+    throwException( "Column name not found ",
                     "BlobReader::build");
   }
 
   m_dataElement = &dataElement;
-  std::string columnName = m_mapping.columnNames()[0];
-  m_columnIndex = relationalData.addBlobData( columnName );
+  relationalData.addBlobData( m_columnName );
   m_relationalData = &relationalData;
   m_blobReader = m_schema.blobStreamingService();
   if(!m_blobReader){
@@ -158,7 +162,7 @@ void ora::BlobReader::read( void* data ){
                     "BlobReader::read");
   }
   void* dataElementAddress = m_dataElement->address( data );
-  coral::Attribute& relDataElement = m_relationalData->data()[ m_columnIndex ];
+  coral::Attribute& relDataElement = m_relationalData->data()[ m_columnName ];
   m_blobReader->read(relDataElement.data<coral::Blob>(), dataElementAddress, m_objectType );
 }
 

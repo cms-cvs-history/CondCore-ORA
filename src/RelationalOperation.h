@@ -37,15 +37,15 @@ namespace ora {
     virtual ~IRelationalData(){
     }
     
-    virtual int addId( const std::string& columnName ) = 0;
+    virtual void addId( const std::string& columnName ) = 0;
 
-    virtual int addData( const std::string& columnName, const std::type_info& columnType ) = 0;
+    virtual void addData( const std::string& columnName, const std::type_info& columnType ) = 0;
 
-    virtual int addBlobData(const std::string& columnName) = 0;
+    virtual void addBlobData(const std::string& columnName) = 0;
     
-    //virtual int addMetadata( const std::string& columnName, const std::type_info& columnType ) = 0;
+    //virtual void addMetadata( const std::string& columnName, const std::type_info& columnType ) = 0;
 
-    virtual int addWhereId( const std::string& columnName ) = 0;
+    virtual void addWhereId( const std::string& columnName ) = 0;
 
     virtual coral::AttributeList& data() = 0;
 
@@ -65,13 +65,13 @@ namespace ora {
 
     public:
 
-    int addId(const std::string& columnName);
+    void addId(const std::string& columnName);
 
-    int addData(const std::string& columnName, const std::type_info& columnType );
+    void addData(const std::string& columnName, const std::type_info& columnType );
 
-    int addBlobData(const std::string& columnName);
+    void addBlobData(const std::string& columnName);
 
-    int addWhereId( const std::string& columnName );
+    void addWhereId( const std::string& columnName );
 
     coral::AttributeList& data();
 
@@ -81,7 +81,7 @@ namespace ora {
 
     public:
 
-    int addWhereId( const std::string& columnName, ConditionType cond );
+    void addWhereId( const std::string& columnName, ConditionType cond );
 
     std::string& updateClause();
 
@@ -168,15 +168,15 @@ namespace ora {
     coral::AttributeListSpecification& attributeListSpecification();
 
     public:
-    int addId(const std::string& columnName);
+    void addId(const std::string& columnName);
 
-    int addData(const std::string& columnName, const std::type_info& columnType );
+    void addData(const std::string& columnName, const std::type_info& columnType );
 
-    int addBlobData(const std::string& columnName);
+    void addBlobData(const std::string& columnName);
 
-    //int addMetadata( const std::string& columnName, const std::type_info& columnType );
+    //void addMetadata( const std::string& columnName, const std::type_info& columnType );
 
-    int addWhereId( const std::string& columnName );
+    void addWhereId( const std::string& columnName );
 
     coral::AttributeList& data();
     coral::AttributeList& whereData();
