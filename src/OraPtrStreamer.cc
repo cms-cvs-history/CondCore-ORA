@@ -89,7 +89,6 @@ namespace ora {
           m_reader->read( destination );
         }
         m_query.clear();
-        m_reader->clear();
         return destination;
       }
       
