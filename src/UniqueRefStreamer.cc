@@ -117,7 +117,6 @@ namespace ora {
           m_reader->read( destination );
         }
         m_depQuery->clear();
-        m_reader->clear();
         return destination;
       }
 
@@ -173,7 +172,6 @@ ora::UniqueRefWriter::UniqueRefWriter( const Reflex::Type& objectType,
                                        ContainerSchema& contSchema ):
   m_objectType( objectType ),
   m_mappingElement( mapping ),
-  m_columnIndexes( {-1,-1} ),
   m_schema( contSchema ),
   m_dataElement( 0 ),
   m_relationalData( 0 ),
@@ -194,14 +192,10 @@ bool ora::UniqueRefWriter::build(DataElement& dataElement,
   m_dataElement = &dataElement;
 
   const std::vector<std::string>& columns = m_mappingElement.columnNames();
-  if( columns.size() < 2 ){
-    throwException("Expected column names have not been found in the mapping.",
-		   "UniqueRefWriter::build");    
-  }
   // booking for ref metadata 
-  m_columnIndexes[0] = relationalData.addData( columns[0],typeid(std::string) );
+  relationalData.addData( columns[0],typeid(std::string) );
   // booking for ref id 
-  m_columnIndexes[1] = relationalData.addData( columns[1],typeid(int) );
+  relationalData.addData( columns[1],typeid(int) );
   m_relationalData = &relationalData;
   m_operationBuffer = &buffer;
   return true;
@@ -251,8 +245,8 @@ void ora::UniqueRefWriter::write( int oid,
   }
   // writing in the parent table
   coral::AttributeList& parentData = m_relationalData->data();
-  parentData[m_columnIndexes[0]].data<std::string>()=className;
-  parentData[m_columnIndexes[1]].data<int>()=refId;
+  parentData[m_mappingElement.columnNames()[0]].data<std::string>()=className;
+  parentData[m_mappingElement.columnNames()[1]].data<int>()=refId;
 }
 
 ora::UniqueRefUpdater::UniqueRefUpdater( const Reflex::Type& objectType,
@@ -285,7 +279,6 @@ ora::UniqueRefReader::UniqueRefReader( const Reflex::Type& objectType,
                                        ContainerSchema& contSchema ):
   m_objectType( objectType ),
   m_mappingElement( mapping ),
-  m_columnIndexes( {-1,-1} ),
   m_schema( contSchema ),
   m_dataElement( 0 ),
   m_relationalData( 0 ),
@@ -303,14 +296,10 @@ bool ora::UniqueRefReader::build( DataElement& dataElement,
                                   IRelationalData& relationalData){
   m_dataElement = &dataElement;
   const std::vector<std::string>& columns = m_mappingElement.columnNames();
-  if( columns.size() < 2 ){
-    throwException("Expected column names have not been found in the mapping.",
-		   "UniqueRefReader::build");    
-  }
   // booking for ref metadata 
-  m_columnIndexes[0] = relationalData.addData( columns[0],typeid(std::string) );
+  relationalData.addData( columns[0],typeid(std::string) );
   // booking for ref id 
-  m_columnIndexes[1] = relationalData.addData( columns[1],typeid(int) );
+  relationalData.addData( columns[1],typeid(int) );
   m_relationalData = &relationalData;
   return true;
 }
@@ -328,8 +317,8 @@ void ora::UniqueRefReader::read( void* data ){
                    "UniqueRefReader::read");
   }
   coral::AttributeList& row = m_relationalData->data();
-  std::string className = row[m_columnIndexes[0]].data<std::string>();
-  int refId = row[m_columnIndexes[1]].data<int>();
+  std::string className = row[m_mappingElement.columnNames()[0]].data<std::string>();
+  int refId = row[m_mappingElement.columnNames()[1]].data<int>();
 
   Reflex::Type refType = ClassUtils::lookupDictionary(className);
   

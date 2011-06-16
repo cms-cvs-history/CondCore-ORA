@@ -15,8 +15,7 @@ ora::OraReferenceStreamerBase::OraReferenceStreamerBase( const Reflex::Type& obj
                                                          MappingElement& mapping,
                                                          ContainerSchema& schema):
   m_objectType( objectType ),
-  m_mapping( mapping ),
-  m_columnIndexes( {-1,-1} ),
+  m_columns( mapping.columnNames() ),
   m_schema( schema ),
   m_dataElement( 0 ),
   m_dataElemOId0( 0 ),
@@ -50,15 +49,15 @@ bool ora::OraReferenceStreamerBase::buildDataElement(DataElement& dataElement,
   }
   m_dataElemOId0 = &dataElement.addChild( contIdMember.Offset(), baseOffsetFunc );
   m_dataElemOId1 = &dataElement.addChild( itemIdMember.Offset(), baseOffsetFunc);
-  // then book the columns in the data attribute... 
-  const std::vector<std::string>& columns =  m_mapping.columnNames();
-  if( columns.size() < 2 ){
+  // then book the columns in the data attribute...  
+  if( m_columns.size()<2 ){
       throwException("Expected column names have not been found in the mapping.",
                      "OraReferenceStreamerBase::buildDataElement");    
   }
   const std::type_info& attrType = typeid(int);
-  for( size_t i=0; i<2; i++ ){
-    m_columnIndexes[i] = relationalData.addData( columns[i],attrType ); 
+  for( std::vector<std::string>::const_iterator iCol = m_columns.begin();
+       iCol != m_columns.end(); ++iCol ){
+    relationalData.addData( *iCol, attrType );
   }
   m_relationalData = &relationalData;
   return true;
@@ -72,10 +71,10 @@ void ora::OraReferenceStreamerBase::bindDataForUpdate( const void* data ){
   }
   
   void* oid0Address = m_dataElemOId0->address( data );
-  coral::Attribute& oid0Attr = m_relationalData->data()[ m_columnIndexes[0] ];
+  coral::Attribute& oid0Attr = m_relationalData->data()[ m_columns[0] ];
   oid0Attr.data<int>()= *static_cast<int*>(oid0Address);
   void* oid1Address = m_dataElemOId1->address( data );
-  coral::Attribute& oid1Attr = m_relationalData->data()[ m_columnIndexes[1] ];
+  coral::Attribute& oid1Attr = m_relationalData->data()[ m_columns[1] ];
   oid1Attr.data<int>()= *static_cast<int*>(oid1Address) ;
   IReferenceHandler* refHandler = m_schema.referenceHandler();
   void* refPtr = m_dataElement->address( data );
@@ -87,12 +86,15 @@ void ora::OraReferenceStreamerBase::bindDataForRead( void* data ){
     throwException("The streamer has not been built.",
                    "OraReferenceStreamerBase::bindDataForRead");
   }
-
+  if( m_columns.size()<2 ){
+    throwException("Expected column names have not been found in the mapping.",
+                   "OraReferenceStreamerBase::bindDataForRead");
+  }
   void* oid0Address = m_dataElemOId0->address( data );
-  coral::Attribute& oid0Attr = m_relationalData->data()[ m_columnIndexes[0] ];
+  coral::Attribute& oid0Attr = m_relationalData->data()[ m_columns[0] ];
   *static_cast<int*>(oid0Address) = oid0Attr.data<int>();
   void* oid1Address = m_dataElemOId1->address( data );
-  coral::Attribute& oid1Attr = m_relationalData->data()[ m_columnIndexes[1] ];
+  coral::Attribute& oid1Attr = m_relationalData->data()[ m_columns[1] ];
   *static_cast<int*>( oid1Address ) = oid1Attr.data<int>();
   IReferenceHandler* refHandler = m_schema.referenceHandler();
   void* refPtr = m_dataElement->address( data );
