@@ -20,8 +20,7 @@ ora::NamedReferenceStreamerBase::NamedReferenceStreamerBase( const Reflex::Type&
                                                              MappingElement& mapping,
                                                              ContainerSchema& schema):
   m_objectType( objectType ),
-  m_mapping( mapping ),
-  m_columnIndex( -1 ),
+  m_columns( mapping.columnNames() ),
   m_schema( schema ),
   m_dataElement( 0 ),
   m_refNameDataElement( 0 ),
@@ -56,13 +55,12 @@ bool ora::NamedReferenceStreamerBase::buildDataElement(DataElement& dataElement,
                    "NamedReferenceStreamerBase::buildDataElement");
   }
   m_flagDataElement = &dataElement.addChild( flagMember.Offset(), 0 );
-  // then book the column in the data attribute... 
-  const std::vector<std::string>& columns =  m_mapping.columnNames();
-  if( columns.size()==0 ){
+  // then book the column in the data attribute...  
+  if( m_columns.size()==0 ){
       throwException("No columns found in the mapping element",
                      "NamedReferenceStreamerBase::buildDataElement");    
   }  
-  m_columnIndex = relationalData.addData( columns[0],  typeid(std::string) );
+  relationalData.addData( m_columns[0],  typeid(std::string) );
   m_relationalData = &relationalData;
   return true;
 }
@@ -74,7 +72,7 @@ void ora::NamedReferenceStreamerBase::bindDataForUpdate( const void* data ){
   }
   
   void* refNameAddress = m_refNameDataElement->address( data );
-  coral::Attribute& refNameAttr = m_relationalData->data()[ m_columnIndex ];
+  coral::Attribute& refNameAttr = m_relationalData->data()[ m_columns[0] ];
   std::string name = *static_cast<std::string*>(refNameAddress);
   if( name.empty() ) name = namedRefNullLabel();
   refNameAttr.data<std::string>()= name;
@@ -88,7 +86,7 @@ void ora::NamedReferenceStreamerBase::bindDataForRead( void* data ){
   void* refNameAddress = m_refNameDataElement->address( data );
   void* ptrAddress = m_ptrDataElement->address( data );
   void* flagAddress = m_flagDataElement->address( data );
-  coral::Attribute& refNameAttr = m_relationalData->data()[ m_columnIndex ];
+  coral::Attribute& refNameAttr = m_relationalData->data()[ m_columns[0] ];
   std::string name = refNameAttr.data<std::string>();
   if( name == namedRefNullLabel() ){
     name = std::string("");
