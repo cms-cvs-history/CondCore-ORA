@@ -19,15 +19,15 @@ namespace ora {
     void execute();
 
     public:
-    int addId(const std::string& columnName);
+    void addId(const std::string& columnName);
 
-    int addData(const std::string& columnName, const std::type_info& columnType );
+    void addData(const std::string& columnName, const std::type_info& columnType );
 
-    int addBlobData(const std::string& columnName);
+    void addBlobData(const std::string& columnName);
 
-    //int addMetadata( const std::string& columnName, const std::type_info& columnType );
+    //void addMetadata( const std::string& columnName, const std::type_info& columnType );
 
-    int addWhereId( const std::string& columnName );
+    void addWhereId( const std::string& columnName );
 
     coral::AttributeList& data();
     coral::AttributeList& whereData();

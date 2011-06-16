@@ -45,24 +45,25 @@ void ora::MultiRecordSelectOperation::clear(){
   m_query.clear();
 }
 
-int ora::MultiRecordSelectOperation::addId(const std::string& columnName){
+void ora::MultiRecordSelectOperation::addId(const std::string& columnName){
+  m_query.addId( columnName );
   m_spec.add( columnName, typeid(int) );
-  return m_query.addId( columnName );
 }
 
-int ora::MultiRecordSelectOperation::addData(const std::string& columnName,
-					     const std::type_info& columnType ){
+void ora::MultiRecordSelectOperation::addData(const std::string& columnName,
+                                               const std::type_info& columnType ){
+  m_query.addData( columnName, columnType );  
   m_spec.add( columnName, columnType );
-  return m_query.addData( columnName, columnType );  
 }
 
-int ora::MultiRecordSelectOperation::addBlobData(const std::string& columnName){
+void ora::MultiRecordSelectOperation::addBlobData(const std::string& columnName){
+  m_query.addBlobData( columnName );  
   m_spec.add( columnName, typeid(coral::Blob) );
-  return m_query.addBlobData( columnName );  
 }
 
-int ora::MultiRecordSelectOperation::addWhereId(const std::string& columnName){
-  return m_query.addWhereId( columnName ); 
+void ora::MultiRecordSelectOperation::addWhereId(const std::string& columnName){
+  m_query.addWhereId( columnName );
+  
 }
 
 coral::AttributeList& ora::MultiRecordSelectOperation::data(){
